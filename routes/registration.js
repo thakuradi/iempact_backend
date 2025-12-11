@@ -10,15 +10,61 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 registrationRouter.post('/', authenticateUser, upload.single('paymentScreenshot'), async (req, res) => {
     try {
-        const { teamName, teamNumber, transactionUid, eventName } = req.body;
+        const { teamName, teamMembers, teamLeader, transactionUid, eventName, registrationType, fullName } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'Payment screenshot is required.' });
         }
 
-        // Required fields check
-        if (!teamName || !teamNumber || !transactionUid || !eventName) {
-            return res.status(400).json({ success: false, message: 'All fields are required.' });
+        // Common required fields
+        if (!transactionUid || !eventName) {
+            return res.status(400).json({ success: false, message: 'Transaction ID and Event Name are required.' });
+        }
+
+        let newRegistrationData = {
+            transactionUid,
+            eventName
+        };
+
+        if (registrationType === 'team') {
+            if (!teamName || !teamLeader || !teamMembers) {
+                return res.status(400).json({ success: false, message: 'Team Name, Team Leader, and Team Members are required for team registration.' });
+            }
+            // Parse teamMembers if it comes as a stringified JSON (common in multipart/form-data)
+            let parsedTeamMembers = teamMembers;
+            try {
+                if (typeof teamMembers === 'string') {
+                    parsedTeamMembers = JSON.parse(teamMembers);
+                }
+            } catch (e) {
+                // If parse fails, assume it's just a string or already in correct format if array
+                // If it's a comma separated string, we might want to split it, but let's assume client sends JSON array string or Array
+                if (typeof teamMembers === 'string') parsedTeamMembers = [teamMembers];
+            }
+
+            if (!Array.isArray(parsedTeamMembers)) {
+                parsedTeamMembers = [parsedTeamMembers];
+            }
+
+            newRegistrationData = {
+                ...newRegistrationData,
+                registrationType: 'team',
+                teamName,
+                teamLeader,
+                teamMembers: parsedTeamMembers,
+                teamNumber: String(parsedTeamMembers.length)
+            };
+        } else {
+            // Solo Registration
+            if (!fullName) {
+                return res.status(400).json({ success: false, message: 'Full Name is required for solo registration.' });
+            }
+            newRegistrationData = {
+                ...newRegistrationData,
+                registrationType: 'solo',
+                fullName,
+                teamNumber: '1' // Default for solo
+            };
         }
 
         // Find user to associate registration
@@ -31,10 +77,7 @@ registrationRouter.post('/', authenticateUser, upload.single('paymentScreenshot'
 
         const newRegistration = await Registration.create({
             userId: user._id,
-            teamName,
-            teamNumber,
-            transactionUid,
-            eventName,
+            ...newRegistrationData,
             paymentScreenshotUrl: screenshotUrl
         });
 

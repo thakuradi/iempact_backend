@@ -6,13 +6,29 @@ const registrationSchema = new mongoose.Schema({
         ref: 'users',
         required: true
     },
+    registrationType: {
+        type: String,
+        enum: ['solo', 'team'],
+        default: 'solo'
+    },
+    fullName: {
+        type: String,
+        required: false // Required for solo if different from user? We'll handle validation in route.
+    },
     teamName: {
         type: String,
-        required: true
+        required: false
     },
-    teamNumber: {
+    teamLeader: {
         type: String,
-        required: true
+        required: false
+    },
+    teamMembers: [{
+        type: String
+    }],
+    teamNumber: {
+        type: String, // Keeping as String to match original schema, but logically is count
+        required: false
     },
     transactionUid: {
         type: String,
