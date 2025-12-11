@@ -32,7 +32,7 @@ authRouter.post('/signup', async (req, res) => {
     const encryptedPassword = encrypt(password);
     const token = jwt.sign(
       { email },                  
-      process.env.JWT_SECRET,     
+      process.env.SECRET_KEY,     
       { expiresIn: '5d' }         
     );
 
@@ -62,7 +62,7 @@ authRouter.get('/checkToken', (req, res) => {
     const token = authHeader.split(' ')[1];
 
     // Verify token
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
       if (err) {
         return res.json({ valid: false });
       }

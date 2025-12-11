@@ -5,9 +5,13 @@ const emailAccountSchema = new mongoose.Schema({
   email: String,
   password: Object,
   token: {
-  type: String,
-  required: false
-}
+    type: String,
+    required: false
+  },
+  verified: {
+    type: Boolean,
+    default: false
+  }
 }, { timestamps: true });
 
 const emailSignup = mongoose.model('users', emailAccountSchema);
