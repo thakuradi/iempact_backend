@@ -36,17 +36,17 @@ adminRouter.post('/signin', (req, res) => {
     return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
 });
 
-// Get All Users (Dashboard) - with their latest registration
+// Get All Users (Dashboard) - with ALL their registrations
 adminRouter.get('/dashboard', authenticateUser, isAdmin, async (req, res) => {
     try {
         const users = await emailSignup.find().select('-password -token');
 
-        // Fetch registrations for all users to show payment screenshots
+        // Fetch all registrations for all users
         const usersWithRegistrations = await Promise.all(users.map(async (user) => {
-            const registration = await Registration.findOne({ userId: user._id }).sort({ createdAt: -1 });
+            const registrations = await Registration.find({ userId: user._id }).sort({ createdAt: -1 });
             return {
                 ...user.toObject(),
-                registration // Attach registration data (contains paymentScreenshotUrl)
+                registrations // Return array of all registrations
             };
         }));
 
@@ -74,22 +74,22 @@ adminRouter.post('/user-data', authenticateUser, isAdmin, async (req, res) => {
     }
 });
 
-// Update Verified Status
-adminRouter.post('/update-user', authenticateUser, isAdmin, async (req, res) => {
+// Update Registration Verification Status
+adminRouter.post('/update-verification', authenticateUser, isAdmin, async (req, res) => {
     try {
-        const { userId, verified } = req.body;
+        const { registrationId, verified } = req.body;
 
-        const user = await emailSignup.findByIdAndUpdate(
-            userId,
+        const registration = await Registration.findByIdAndUpdate(
+            registrationId,
             { verified: verified },
             { new: true }
-        ).select('-password -token');
+        );
 
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+        if (!registration) {
+            return res.status(404).json({ success: false, message: 'Registration not found' });
         }
 
-        res.status(200).json({ success: true, message: 'User status updated', user });
+        res.status(200).json({ success: true, message: 'Registration status updated', registration });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

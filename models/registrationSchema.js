@@ -25,6 +25,10 @@ const registrationSchema = new mongoose.Schema({
     paymentScreenshotUrl: {
         type: String,
         required: true
+    },
+    verified: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 
