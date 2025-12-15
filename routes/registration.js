@@ -10,20 +10,21 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 registrationRouter.post('/', authenticateUser, upload.single('paymentScreenshot'), async (req, res) => {
     try {
-        const { teamName, teamMembers, teamLeader, transactionUid, eventName, registrationType, fullName } = req.body;
+        const { teamName, teamMembers, teamLeader, transactionUid, eventName, registrationType, fullName, collegeName } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'Payment screenshot is required.' });
         }
 
         // Common required fields
-        if (!transactionUid || !eventName) {
-            return res.status(400).json({ success: false, message: 'Transaction ID and Event Name are required.' });
+        if (!transactionUid || !eventName || !collegeName) {
+            return res.status(400).json({ success: false, message: 'Transaction ID, Event Name, and College Name are required.' });
         }
 
         let newRegistrationData = {
             transactionUid,
-            eventName
+            eventName,
+            collegeName
         };
 
         if (registrationType === 'team') {

@@ -11,6 +11,10 @@ const registrationSchema = new mongoose.Schema({
         enum: ['solo', 'team'],
         default: 'solo'
     },
+    collegeName: {
+        type: String,
+        required: true
+    },
     fullName: {
         type: String,
         required: false // Required for solo if different from user? We'll handle validation in route.
