@@ -1,6 +1,6 @@
 import express from 'express';
 import emailSignup from '../models/userSchema.js';
-import { encrypt,decrypt } from '../utils/passwordManager.js';
+import { encrypt, decrypt } from '../utils/passwordManager.js';
 import jwt from 'jsonwebtoken';
 
 const authRouter = express.Router();
@@ -9,7 +9,7 @@ authRouter.post('/signin', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await emailSignup.findOne({ email });
-    
+
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
@@ -17,6 +17,15 @@ authRouter.post('/signin', async (req, res) => {
     if (decrypt(user.password) !== password) {
       return res.status(401).json({ success: false, message: "Incorrect password" });
     }
+
+    const token = jwt.sign(
+      { email },
+      process.env.SECRET_KEY,
+      { expiresIn: '5d' }
+    );
+
+    user.token = token;
+    await user.save();
 
     return res.status(200).json({ success: true, user });
   } catch (err) {
@@ -31,9 +40,9 @@ authRouter.post('/signup', async (req, res) => {
     const { email, password } = req.body;
     const encryptedPassword = encrypt(password);
     const token = jwt.sign(
-      { email },                  
-      process.env.SECRET_KEY,     
-      { expiresIn: '5d' }         
+      { email },
+      process.env.SECRET_KEY,
+      { expiresIn: '5d' }
     );
 
     const newEntry = await emailSignup.create({
