@@ -7,34 +7,66 @@ const registrationSchema = new mongoose.Schema(
       ref: "users",
       required: true,
     },
+
     userEmail: {
       type: String,
       required: true,
     },
+
+    registrationType: {
+      type: String,
+      enum: ["solo", "team"],
+      required: true,
+    },
+
+    // SOLO
+    fullName: {
+      type: String,
+    },
+
+    // TEAM
     teamName: {
       type: String,
-      required: false,
     },
+
+    teamLeader: {
+      type: String,
+    },
+
+    teamMembers: {
+      type: [String],
+      default: [],
+    },
+
     teamNumber: {
       type: String,
-      required: false,
     },
+
+    // COMMON
+    collegeName: {
+      type: String,
+    },
+
     contactNumber: {
       type: String,
       required: true,
     },
+
     transactionUid: {
       type: String,
       required: true,
     },
+
     eventName: {
       type: String,
       required: true,
     },
+
     paymentScreenshotUrl: {
       type: String,
       required: true,
     },
+
     verified: {
       type: Boolean,
       default: false,
@@ -43,5 +75,4 @@ const registrationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Registration = mongoose.model("Registration", registrationSchema);
-export default Registration;
+export default mongoose.model("Registration", registrationSchema);
