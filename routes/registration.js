@@ -14,8 +14,17 @@ registrationRouter.post(
   upload.single("paymentScreenshot"),
   async (req, res) => {
     try {
-      const { teamName, teamNumber, contactNumber, transactionUid, eventName } =
-        req.body;
+      const {
+        fullName,
+        collegeName,
+        teamName,
+        teamNumber,
+        contactNumber,
+        transactionUid,
+        eventName,
+      } = req.body;
+
+      console.log(req.body);
 
       if (!req.file) {
         return res
@@ -24,13 +33,7 @@ registrationRouter.post(
       }
 
       // Required fields check
-      if (
-        !teamName ||
-        !teamNumber ||
-        !contactNumber ||
-        !transactionUid ||
-        !eventName
-      ) {
+      if (!contactNumber || !transactionUid || !eventName) {
         return res
           .status(400)
           .json({ success: false, message: "All fields are required." });
@@ -49,11 +52,13 @@ registrationRouter.post(
       const newRegistration = await Registration.create({
         userId: user._id,
         userEmail: user.email,
+        fullName,
+        eventName,
+        collegeName,
         teamName,
         teamNumber,
         contactNumber,
         transactionUid,
-        eventName,
         paymentScreenshotUrl: screenshotUrl,
       });
 

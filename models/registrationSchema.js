@@ -13,11 +13,11 @@ const registrationSchema = new mongoose.Schema(
     },
     teamName: {
       type: String,
-      required: true,
+      required: false,
     },
     teamNumber: {
       type: String,
-      required: true,
+      required: false,
     },
     contactNumber: {
       type: String,
