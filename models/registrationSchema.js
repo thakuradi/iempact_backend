@@ -1,56 +1,78 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const registrationSchema = new mongoose.Schema({
+const registrationSchema = new mongoose.Schema(
+  {
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
     },
-    registrationType: {
-        type: String,
-        enum: ['solo', 'team'],
-        default: 'solo'
-    },
-    collegeName: {
-        type: String,
-        required: true
-    },
-    fullName: {
-        type: String,
-        required: false // Required for solo if different from user? We'll handle validation in route.
-    },
-    teamName: {
-        type: String,
-        required: false
-    },
-    teamLeader: {
-        type: String,
-        required: false
-    },
-    teamMembers: [{
-        type: String
-    }],
-    teamNumber: {
-        type: String, // Keeping as String to match original schema, but logically is count
-        required: false
-    },
-    transactionUid: {
-        type: String,
-        required: true
-    },
-    eventName: {
-        type: String,
-        required: true
-    },
-    paymentScreenshotUrl: {
-        type: String,
-        required: true
-    },
-    verified: {
-        type: Boolean,
-        default: false
-    }
-}, { timestamps: true });
 
-const Registration = mongoose.model('Registration', registrationSchema);
-export default Registration;
+    userEmail: {
+      type: String,
+      required: true,
+    },
+
+    registrationType: {
+      type: String,
+      enum: ["solo", "team"],
+      required: true,
+    },
+
+    // SOLO
+    fullName: {
+      type: String,
+    },
+
+    // TEAM
+    teamName: {
+      type: String,
+    },
+
+    teamLeader: {
+      type: String,
+    },
+
+    teamMembers: {
+      type: [String],
+      default: [],
+    },
+
+    teamNumber: {
+      type: String,
+    },
+
+    // COMMON
+    collegeName: {
+      type: String,
+    },
+
+    contactNumber: {
+      type: String,
+      required: true,
+    },
+
+    transactionUid: {
+      type: String,
+      required: true,
+    },
+
+    eventName: {
+      type: String,
+      required: true,
+    },
+
+    paymentScreenshotUrl: {
+      type: String,
+      required: true,
+    },
+
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Registration", registrationSchema);
